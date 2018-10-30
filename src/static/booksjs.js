@@ -8,17 +8,17 @@ $(document).ready(function () {
 function loadBooks() {
     $.ajax(
     {
-        url: 'books/',
+        url: 'book/',
         data: {},
         type: "GET",
         dataType: "json",
         success:    booksSucces,
         error:      function () {
-            console.log("error");
+            console.log("error - loadBooks()");
             errorLoadingBooks();
         },
         complete:   function () {
-            console.log("complete");
+            console.log("complete - loadBooks()");
             makeTableClickable();
         }
     });
@@ -31,7 +31,6 @@ function errorLoadingBooks() {
 }
 
 function booksSucces(data) {
-    console.log(data[0]);
 
     let tbody = $('#booksTable > tbody');
 
@@ -45,9 +44,9 @@ function booksSucces(data) {
 
         let contentRow = $(
             "<tr class='bg-light d-none'>" +
-                "<td colspan=2>" +
-                    "<div class='book-info'>" +
-                    "</div>" +
+                "<td class='book-info' colspan=2>" +
+                    // "<div class='book-info'>" +
+                    // "</div>" +
                 "</td>" +
             "</tr>"
         );
@@ -55,14 +54,15 @@ function booksSucces(data) {
         let emptyRow = $("<tr style='display:none;'></tr>");
 
         tbody.append([titleAuthorRow, contentRow, emptyRow]);
-
     });
 
 };
 
 function makeTableClickable() {
     $(".clickable-row").click(function() {
+        $(this).toggleClass("bg-info");
         $(this).next().toggleClass("d-none");
+        loadSingleBookInfo($(this).data('bookid'), $(this));
     });
 
     addPointerToRow();
@@ -70,4 +70,41 @@ function makeTableClickable() {
 
 function addPointerToRow() {
     $(".clickable-row").css( 'cursor', 'pointer' )
+}
+
+function loadSingleBookInfo(id, row) {
+    let info = row.next().find('.book-info');
+
+    if (info.children().length == 0) {
+        let url = 'book/' + id;
+        $.ajax(
+            {
+                url: 'book/' + id,
+                data: {},
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    console.log("success - loadSingleBookInfo()");
+                    let div = getSingleBookInfoDiv(data);
+                    info.append(div);
+                },
+                error: function () {
+                    console.log("error - loadSingleBookInfo()");
+                },
+                complete: function () {
+                    console.log("complete - loadSingleBookInfo()");
+                }
+            });
+    }
+}
+
+function getSingleBookInfoDiv(data) {
+    return $("<div>" +
+            "<p> author: " + data.author + "</p>" +
+            "<p> title: " + data.title + "</p>" +
+            "<p> publisher: " + data.publisher + "</p>" +
+            "<p> genre: " + data.genre + "</p>" +
+            "<p> isbn: " + data.isbn + "</p>" +
+        "</div>"
+    )
 }
