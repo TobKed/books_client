@@ -1,55 +1,44 @@
 $(document).ready(function () {
 
-    $('#populate').on('click', function () {
-        $(this).remove();
-
         $.ajax(
             {
                 url: 'book/',
                 data: {},
                 type: "GET",
                 dataType: "json",
-                success: booksSucces,
-                error: function () {
-                },
-                complete: function () {
-                }
+                success:    booksSucces,
+                error:      function () { console.log("error") },
+                complete:   function () { console.log("complete") }
             });
-    });
-
 
 });
 
 function booksSucces(data) {
-    console.log(data);
+    console.log(data[0]);
+
+    let tbody = $('#booksTable > tbody');
 
     $.each(data, function (key, val) {
-        $('#booksTable').append("<tr height='100' class='book-row' data-id=" + val.id + ">" +
-            "<td>" + val.id + "</td>" +
-            "<td>" + val.author + "</td>" +
-            "<td>" + val.title + "</td>" +
-            "</tr>");
+        let titleAuthorRow = $(
+            "<tr data-bookId=" + val.id + ">" +
+                "<td>" + val.author + "</td>" +
+                "<td>" + val.title + "</td>" +
+            "</tr>"
+        );
+
+        let contentRow = $(
+            "<tr class='bg-light d-none'>" +
+                "<td colspan=2>" +
+                    "<div class='book-info'>" +
+                    "</div>" +
+                "</td>" +
+            "</tr>"
+        );
+
+        let emptyRow = $("<tr style='display:none;'></tr>");
+
+        tbody.append([titleAuthorRow, contentRow, emptyRow]);
 
     });
 
-    $.each($('.book-row'), function () {
-        $(this).hover(function () {
-                let bookId = $(this).data('id');
-                $.ajax(
-                    {
-                        url: 'book/' + bookId,
-                        data: {},
-                        type: "GET",
-                        dataType: "json",
-                        success: function (data) {
-                            $("table").find("[data-id='" + bookId + "']").append("<td class = 'info'>" + data.isbn + "</td>" +
-                                                                                 "<td class = 'info'>" + data.publisher + "</td>");
-                        },
-                    });
-            }
-        , function () {
-            $(this).find('.info').remove();
-            }
-        )
-    })
-}
+};

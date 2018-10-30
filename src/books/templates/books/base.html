@@ -26,7 +26,8 @@
 
 <main role="main" class="container">
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
 
             {% if messages %}
                 {% for message in messages %}
@@ -38,11 +39,16 @@
 
             {% block content %}
             {% endblock %}
-
         </div>
+        <div class="col-md-2"></div>
     </div>
 </main>
 
+<footer class="page-footer">
+  <div class="footer-copyright text-center py-3">
+    <a class="text-dark" href="https://github.com/TobKed/books_client">GitHub</a>
+  </div>
+</footer>
 
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->

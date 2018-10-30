@@ -1,15 +1,20 @@
 {% extends "books/base.html" %}
 {% block content %}
 
-<button id="populate">populate</button>
 
-<table id="booksTable" border="1">
-    <tr>
-        <th>id</th>
-        <th>author</th>
-        <th>title</th>
-    </tr>
-</table>
+<td class="table-responsive mt-3">
 
+    <table id="booksTable" class="table table-bordred table-striped">
+        <thead>
+            <th>Author</th>
+            <th>Title</th>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <div class="clearfix"></div>
+
+</div>
 
 {% endblock content %}
