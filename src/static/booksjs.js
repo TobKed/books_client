@@ -45,7 +45,7 @@ function booksSucces(data) {
 
         let contentRow = $(
             "<tr class='bg-light d-none'>" +
-                "<td class='book-info' colspan=2>" +
+                "<td class='book-info container' colspan=2>" +
                 "</td>" +
             "</tr>"
         );
@@ -98,15 +98,20 @@ function loadSingleBookInfo(id, row) {
 }
 
 function getSingleBookInfoDiv(data) {
-    return $("<div>" +
-            "<p> author: " + data.author + "</p>" +
-            "<p> title: " + data.title + "</p>" +
-            "<p> publisher: " + data.publisher + "</p>" +
-            "<p> genre: " + genreFromNumbers(data.genre) + "</p>" +
-            "<p> isbn: " + data.isbn + "</p>" +
-            "</div>" +
-                "<a class='btn btn-info mx-2' href='#'>Update</a>" +
+    return $("<table class='table mb-2'>" +
+                "<tr class='bg-light'><td> author: </td>    <td class='book-author'>" + data.author + "</td></tr>" +
+                "<tr class='bg-light'><td> title: </td>     <td class='book-title'>" + data.title + "</td></tr>" +
+                "<tr class='bg-light'><td> publisher: </td> <td class='book-publisher'>" + data.publisher + "</td></tr>" +
+                "<tr class='bg-light'><td> genre: </td>     <td class='book-genre'>" + genreFromNumbers(data.genre) + "</td></tr>" +
+                "<tr class='bg-light'><td> isbn: </td>      <td class='book-isbn'>" + data.isbn + "</td></tr>" +
+            "</table>" +
+            "<div class='single-book-buttons-standard'>" +
+                "<button type='button' class='btn btn-info mx-2''>Delete</button>" +
                 "<button type='button' class='btn btn-danger mx-2' data-toggle='modal' data-target='#confirmBookRemoveModal'>Delete</button>" +
+            "</div>" +
+            "<div class='single-book-buttons-save d-none'>" +
+                "<button type='button' class='btn btn-info mx-2'>Save</button>" +
+                "<button type='button' class='btn btn-secondary mx-2'>Cancel</button>" +
             "</div>"
     )
 }
