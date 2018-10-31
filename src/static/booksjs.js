@@ -36,14 +36,11 @@ function loadBooks() {
 
 
 function errorLoadingBooks() {
-    $('#booksTable > tbody').append("<tr>" +
-        "<td colspan=2 class='text-center'> Error loading books </td>" +
-        "</tr>")
+    $('#booksTable > tbody').append("<tr><td colspan=2 class='text-center'> Error loading books </td></tr>")
 }
 
 
 function booksSucces(data) {
-
     let tbody = $('#booksTable > tbody');
 
     $.each(data, function (key, val) {
@@ -71,13 +68,13 @@ function booksSucces(data) {
 
 
 function makeTableClickable() {
-    $(".clickable-row").click(function () {
+    let clickableRows = $(".clickable-row");
+    clickableRows.click(function () {
         $(this).toggleClass("bg-info");
         $(this).next().toggleClass("d-none");
         loadSingleBookInfo($(this).data('bookid'), $(this));
     });
-
-    $(".clickable-row").css('cursor', 'pointer')
+    clickableRows.css('cursor', 'pointer')
 }
 
 
@@ -141,30 +138,42 @@ function getSingleBookInfoDiv(data) {
         return genres.hasOwnProperty(num) ? genres[num] : null;
     }
 
+    function generateGenreOptions(num) {
+        let rv = "";
+        $.each(genres, function(genreNum, genreName) {
+            rv += "<option value='" + genreNum + "'";
+            if (genreNum == num) rv += "selected";
+            rv += ">" + genreName + "</option>";
+        });
+        console.log("test");
+        return rv;
+    }
+
     return $("<table class='table mb-2 book-info-table'>" +
                 "<tr class='bg-light'>" +
                     "<td> author: </td>" +
                     "<td class='book-info-cell' >" + data.author + "</td>" +
-                    "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' type='text' value='" + data.author + "'></td>" +
+                    "<td class='book-edit-cell p-1 align-middle d-none' maxlength='200'><input class='form-control' type='text' value='" + data.author + "'></td>" +
                 "</tr>" +
                 "<tr class='bg-light'>" +
                     "<td> title: </td>" +
                     "<td class='book-info-cell' >" + data.title + "</td>" +
-                    "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' type='text' value='" + data.title + "'></td>" +
+                    "<td class='book-edit-cell p-1 align-middle d-none' maxlength='200'><input class='form-control' type='text' value='" + data.title + "'></td>" +
                 "</tr>" +
                 "<tr class='bg-light'>" +
                     "<td> publisher: </td>" +
                 "<td class='book-info-cell' >" + data.publisher + "</td>" +
-                "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' type='text' value='" + data.publisher + "'></td>" +
+                "<td class='book-edit-cell p-1 align-middle d-none' maxlength='200'><input class='form-control' type='text' value='" + data.publisher + "'></td>" +
                 "</tr>" +
                 "<tr class='bg-light'>" +
                     "<td> genre: </td>" +
                     "<td class='book-info-cell' >" + genreFromNumbers(data.genre) + "</td>" +
+                    "<td class='book-edit-cell p-1 align-middle d-none'><select class='form-control'>" + generateGenreOptions(data.genre) + "</select></td>" +
                     "</tr>" +
                 "<tr class='bg-light'>" +
                     "<td> isbn: </td>" +
                     "<td class='book-info-cell' >" + data.isbn + "</td>" +
-                    "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' type='text' value='" + data.isbn + "'></td>" +
+                    "<td class='book-edit-cell p-1 align-middle d-none'><input maxlength='17' class='form-control' type='text' value='" + data.isbn + "'></td>" +
                     "</tr>" +
             "</table>" +
             "<div class='s-book-buttons'>" +
@@ -216,4 +225,3 @@ function confirmedDeleteBookButtonAction() {
     }
 
 }
-
