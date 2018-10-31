@@ -45,8 +45,6 @@ function booksSucces(data) {
         let contentRow = $(
             "<tr class='bg-light d-none'>" +
                 "<td class='book-info' colspan=2>" +
-                    // "<div class='book-info'>" +
-                    // "</div>" +
                 "</td>" +
             "</tr>"
         );
@@ -76,7 +74,6 @@ function loadSingleBookInfo(id, row) {
     let info = row.next().find('.book-info');
 
     if (info.children().length == 0) {
-        let url = 'book/' + id;
         $.ajax(
             {
                 url: 'book/' + id,
@@ -103,8 +100,21 @@ function getSingleBookInfoDiv(data) {
             "<p> author: " + data.author + "</p>" +
             "<p> title: " + data.title + "</p>" +
             "<p> publisher: " + data.publisher + "</p>" +
-            "<p> genre: " + data.genre + "</p>" +
+            "<p> genre: " + genreFromNumbers(data.genre) + "</p>" +
             "<p> isbn: " + data.isbn + "</p>" +
         "</div>"
     )
+}
+
+function genreFromNumbers(num) {
+    let genres = {
+        1: "Romans",
+        2: "Obyczajowa",
+        3: "Sci-fi i fantasy",
+        4: "Literatura faktu",
+        5: "Popularnonaukowa",
+        6: "Poradnik",
+        7: "Kryminał, sensacja"
+    };
+    return genres.hasOwnProperty(num) ? genres[num] : null;
 }
