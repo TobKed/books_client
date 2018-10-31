@@ -127,12 +127,32 @@ function genreFromNumbers(num) {
 function updateDeleteBookModal(modalBody, id) {
     let body = $("#confirmBookRemoveModal").find(".modal-body");
     body.html("Do you want to delete book: " + modalBody + " ?<br>");
-    $("#confirmBookRemoveModal").find("#deleteBookConfirmed").data( "foo", 52 );
+    $("#deleteBookConfirmed").attr('data-bookid', id);
 }
 
 function deleteBookButton() {
-    $('#deleteBookConfirmed').click(function(e){
-      e.preventDefault();
-      $('#confirmBookRemoveModal').modal('hide')
+    $('#deleteBookConfirmed').click(function (e) {
+        e.preventDefault();
+        let id = $(this).attr("data-bookid");
+        $.ajax(
+            {
+                url: 'book/' + id,
+                data: {},
+                type: "DELETE",
+                dataType: "json",
+                success: function (data) {
+                    console.log("success - deleteBookButton()");
+                    $('#confirmBookRemoveModal').modal('hide');
+                    $('#booksTable > tbody').html("");
+                    loadBooks();
+                },
+                error: function () {
+                    console.log("error - deleteBookButton()");
+                },
+                complete: function () {
+                    console.log("complete - deleteBookButton()");
+                }
+            });
+
     });
 };
