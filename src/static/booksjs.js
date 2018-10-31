@@ -84,6 +84,7 @@ function loadSingleBookInfo(id, row) {
                     console.log("success - loadSingleBookInfo()");
                     let div = getSingleBookInfoDiv(data);
                     info.append(div);
+                    updateDeleteBookModal(data.author + " - " + data.title);
                 },
                 error: function () {
                     console.log("error - loadSingleBookInfo()");
@@ -120,4 +121,9 @@ function genreFromNumbers(num) {
         7: "Kryminał, sensacja"
     };
     return genres.hasOwnProperty(num) ? genres[num] : null;
+}
+
+function updateDeleteBookModal(modalBody) {
+    let body = $("#confirmBookRemoveModal").find(".modal-body");
+    body.html("Do you want to delete book: " + modalBody + " ?<br>");
 }
