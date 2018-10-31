@@ -55,7 +55,7 @@ function booksSucces(data) {
         tbody.append([titleAuthorRow, contentRow, emptyRow]);
     });
 
-};
+}
 
 function makeTableClickable() {
     $(".clickable-row").click(function() {
@@ -148,8 +148,7 @@ function deleteBookButton() {
                 success: function (data) {
                     console.log("success - deleteBookButton()");
                     $('#confirmBookRemoveModal').modal('hide');
-                    $('#booksTable > tbody').html("");
-                    loadBooks();
+                    deleteBookTrs(id);
                 },
                 error: function () {
                     console.log("error - deleteBookButton()");
@@ -160,4 +159,12 @@ function deleteBookButton() {
             });
 
     });
-};
+}
+
+function deleteBookTrs(id) {
+    let selector = ".clickable-row[data-bookid='" + id + "']";
+    let mainTr = $(selector);
+    mainTr.next().next().remove();
+    mainTr.next().remove();
+    mainTr.remove();
+}
