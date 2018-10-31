@@ -1,6 +1,7 @@
 $(document).ready(function () {
 
     loadBooks();
+    deleteBookButton();
 
 });
 
@@ -84,7 +85,7 @@ function loadSingleBookInfo(id, row) {
                     console.log("success - loadSingleBookInfo()");
                     let div = getSingleBookInfoDiv(data);
                     info.append(div);
-                    updateDeleteBookModal(data.author + " - " + data.title);
+                    updateDeleteBookModal(data.author + " - " + data.title, data.id);
                 },
                 error: function () {
                     console.log("error - loadSingleBookInfo()");
@@ -123,7 +124,15 @@ function genreFromNumbers(num) {
     return genres.hasOwnProperty(num) ? genres[num] : null;
 }
 
-function updateDeleteBookModal(modalBody) {
+function updateDeleteBookModal(modalBody, id) {
     let body = $("#confirmBookRemoveModal").find(".modal-body");
     body.html("Do you want to delete book: " + modalBody + " ?<br>");
+    $("#confirmBookRemoveModal").find("#deleteBookConfirmed").data( "foo", 52 );
 }
+
+function deleteBookButton() {
+    $('#deleteBookConfirmed').click(function(e){
+      e.preventDefault();
+      $('#confirmBookRemoveModal').modal('hide')
+    });
+};
