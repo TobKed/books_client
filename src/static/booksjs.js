@@ -102,7 +102,10 @@ function getSingleBookInfoDiv(data) {
             "<p> publisher: " + data.publisher + "</p>" +
             "<p> genre: " + genreFromNumbers(data.genre) + "</p>" +
             "<p> isbn: " + data.isbn + "</p>" +
-        "</div>"
+            "</div>" +
+                "<a class='btn btn-info mx-2' href='#'>Update</a>" +
+                "<button type='button' class='btn btn-danger mx-2' data-toggle='modal' data-target='#confirmBookRemoveModal'>Delete</button>" +
+            "</div>"
     )
 }
 
