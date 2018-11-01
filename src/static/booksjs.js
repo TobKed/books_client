@@ -145,7 +145,6 @@ function getSingleBookInfoDiv(data) {
             if (genreNum == num) rv += "selected";
             rv += ">" + genreName + "</option>";
         });
-        console.log("test");
         return rv;
     }
 
@@ -192,11 +191,10 @@ function getSingleBookInfoDiv(data) {
 
 function confirmedDeleteBookButtonAction() {
 
-    $('#deleteBookConfirmed').click(function (e) {
-        e.preventDefault();
+    // http://webroxtar.com/2011/10/solution-jquery-click-event-gets-called-twice-fires-twice/
+    $('#deleteBookConfirmed').unbind('click').click(function () {
         let id = $(this).attr("data-bookid");
-        $.ajax(
-            {
+        $.ajax({
                 url: 'book/' + id,
                 data: {},
                 type: "DELETE",
@@ -212,8 +210,7 @@ function confirmedDeleteBookButtonAction() {
                 complete: function () {
                     console.log("complete - confirmedDeleteBookButtonAction()");
                 }
-            });
-
+        });
     });
 
     function deleteBookTrs(id) {
