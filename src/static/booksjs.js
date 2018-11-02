@@ -92,8 +92,9 @@ function loadSingleBookInfo(id, row) {
                     console.log("success - loadSingleBookInfo()");
                     let div = getSingleBookInfoDiv(data);
                     info.append(div);
-                    updateEditBookButton(div);
+                    updateEditCancelBookButton(div);
                     updateDeleteBookButton(div, id, data);
+                    updateSaveBookButton(div, id, data);
                 },
                 error: function () {
                     console.log("error - loadSingleBookInfo()");
@@ -104,28 +105,38 @@ function loadSingleBookInfo(id, row) {
             });
     }
 
+    function toggleButtonsDivs(div) {
+        let buttonDivs = $(div).siblings(".s-book-buttons").children();
+        $.each(buttonDivs, function () {
+            $(this).toggleClass("d-none");
+        })
+    }
+
     function updateDeleteBookModal(id, data) {
         let body = $("#confirmBookRemoveModal").find(".modal-body");
         body.html("Do you want to delete book: " + data.author + " - " + data.title + " ?<br>");
         $("#deleteBookConfirmed").attr('data-bookid', id);
     }
 
-    function updateEditBookButton(div) {
+    function updateEditCancelBookButton(div) {
         $(div).find(".edit-book-button, .cancel-edit-book-button").click(function () {
             let tableDataToFields = $(div).find(".book-info-cell, .book-edit-cell");
             $.each(tableDataToFields, function () {
                 $(this).toggleClass("d-none");
             });
-            let buttonDivs = $(div).siblings(".s-book-buttons").children();
-            $.each(buttonDivs, function () {
-                $(this).toggleClass("d-none");
-            })
+            toggleButtonsDivs(div);
         });
     }
 
     function updateDeleteBookButton(div, id, data) {
         $(div).find(".delete-book-button").click(function () {
             updateDeleteBookModal(id, data);
+        })
+    }
+
+    function updateSaveBookButton(div, id, data) {
+        $(div).find(".save-book-button").click(function () {
+            console.log('save button pressed');
         })
     }
 
@@ -182,7 +193,7 @@ function getSingleBookInfoDiv(data) {
                     "<button type='button' class='btn btn-danger mx-2 delete-book-button' data-toggle='modal' data-target='#confirmBookRemoveModal'>Delete</button>" +
                 "</div>" +
                 "<div class='d-none'>" +
-                    "<button type='button' class='btn btn-info mx-2'>Save</button>" +
+                    "<button type='button' class='btn btn-info mx-2 save-book-button'>Save</button>" +
                     "<button type='button' class='btn btn-secondary mx-2 cancel-edit-book-button'>Cancel</button>" +
                 "</div>" +
             "</div>"
