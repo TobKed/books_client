@@ -104,7 +104,7 @@ function loadSingleBookInfo(id, row) {
     function successloadSingleBookInfo(data) {
         let div = getSingleBookInfoDiv(data);
         info.append(div);
-        toggleShowEditBook(div);
+        assignToggleShowEditBook(div);
         updateDeleteBookButton(div, id, data);
         updateSaveBookButton(div, id, data);
     }
@@ -122,14 +122,18 @@ function loadSingleBookInfo(id, row) {
         $("#deleteBookConfirmed").attr('data-bookid', id);
     }
 
-    function toggleShowEditBook(div) {
+    function assignToggleShowEditBook(div) {
         $(div).find(".edit-book-button, .cancel-edit-book-button").click(function () {
-            let tableDataToFields = $(div).find(".book-info-cell, .book-edit-cell");
-            $.each(tableDataToFields, function () {
-                $(this).toggleClass("d-none");
-            });
-            toggleButtonsDivs(div);
+            toggleShowEditBook(div);
         });
+    }
+
+    function toggleShowEditBook(div) {
+        let tableDataToFields = $(div).find(".book-info-cell, .book-edit-cell");
+        $.each(tableDataToFields, function () {
+            $(this).toggleClass("d-none");
+        });
+        toggleButtonsDivs(div);
     }
 
     function updateDeleteBookButton(div, id, data) {
@@ -146,7 +150,8 @@ function loadSingleBookInfo(id, row) {
                     type: "PUT"})
                     .done(function (data) {
                         console.log("success - updateSaveBookButton()");
-                        toggleShowEditBook(div);
+                        info.empty();
+                        successloadSingleBookInfo(data);
                     })
                     .fail(function (data) {
                         console.log("error - updateSaveBookButton(). data: " + data['responseText']);
