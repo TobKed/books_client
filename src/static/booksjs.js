@@ -64,13 +64,14 @@ function booksSucces(data) {
     });
 
     confirmedDeleteBookButtonAction();
+    addNewBookRow();
 }
 
 
 function makeTableClickable() {
     let clickableRows = $(".clickable-row");
     clickableRows.click(function () {
-        $(this).toggleClass("bg-info");
+        $(this).toggleClass("bg-info text-white");
         $(this).next().toggleClass("d-none");
         loadSingleBookInfo($(this).data('bookid'), $(this));
     });
@@ -290,4 +291,24 @@ function confirmedDeleteBookButtonAction() {
         mainTr.remove();
     }
 
+}
+
+function addNewBookRow() {
+    let tbody = $('#booksTable > tbody');
+    let titleAuthorRow = $(
+        "<tr class='clickable-row bg-primary text-light text-center' data-bookId='-1'>" +
+            "<td colspan='2'> ADD NEW BOOK </td>" +
+        "</tr>"
+    );
+
+    let contentRow = $(
+        "<tr class='bg-light d-none'>" +
+            "<td class='book-info container' colspan=2>" +
+            "</td>" +
+        "</tr>"
+    );
+
+    let emptyRow = $("<tr style='display:none;'></tr>");
+
+    tbody.append([titleAuthorRow, contentRow, emptyRow]);
 }
