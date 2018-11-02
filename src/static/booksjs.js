@@ -90,11 +90,7 @@ function loadSingleBookInfo(id, row) {
                 dataType: "json",
                 success: function (data) {
                     console.log("success - loadSingleBookInfo()");
-                    let div = getSingleBookInfoDiv(data);
-                    info.append(div);
-                    updateEditCancelBookButton(div);
-                    updateDeleteBookButton(div, id, data);
-                    updateSaveBookButton(div, id, data);
+                    successloadSingleBookInfo(data);
                 },
                 error: function () {
                     console.log("error - loadSingleBookInfo()");
@@ -103,6 +99,14 @@ function loadSingleBookInfo(id, row) {
                     console.log("complete - loadSingleBookInfo()");
                 }
             });
+    }
+
+    function successloadSingleBookInfo(data) {
+        let div = getSingleBookInfoDiv(data);
+        info.append(div);
+        toggleShowEditBook(div);
+        updateDeleteBookButton(div, id, data);
+        updateSaveBookButton(div, id, data);
     }
 
     function toggleButtonsDivs(div) {
@@ -118,7 +122,7 @@ function loadSingleBookInfo(id, row) {
         $("#deleteBookConfirmed").attr('data-bookid', id);
     }
 
-    function updateEditCancelBookButton(div) {
+    function toggleShowEditBook(div) {
         $(div).find(".edit-book-button, .cancel-edit-book-button").click(function () {
             let tableDataToFields = $(div).find(".book-info-cell, .book-edit-cell");
             $.each(tableDataToFields, function () {
@@ -136,8 +140,33 @@ function loadSingleBookInfo(id, row) {
 
     function updateSaveBookButton(div, id, data) {
         $(div).find(".save-book-button").click(function () {
-            console.log('save button pressed');
-        })
+            $.ajax({
+                    url: 'book/' + id,
+                    data: editInputsToJson(div),
+                    type: "PUT"})
+                    .done(function (data) {
+                        console.log("success - updateSaveBookButton()");
+                        toggleShowEditBook(div);
+                    })
+                    .fail(function (data) {
+                        console.log("error - updateSaveBookButton(). data: " + data['responseText']);
+                    })
+                    .always(function () {
+                        console.log("complete - updateSaveBookButton()");
+                    })
+        });
+
+        function editInputsToJson(div) {
+            data = {};
+            $.each($(div).find(".book-edit-cell > input"), function() {
+                let name = $(this).attr("name");
+                let value = $(this).val();
+                data[name] = value;
+                console.log(name + ": " + value);
+            });
+            data['genre'] = $('select[name="genre"]').val();
+            return data;
+        }
     }
 
 }
@@ -163,27 +192,27 @@ function getSingleBookInfoDiv(data) {
                 "<tr class='bg-light'>" +
                     "<td> author: </td>" +
                     "<td class='book-info-cell' >" + data.author + "</td>" +
-                    "<td class='book-edit-cell p-1 align-middle d-none' maxlength='200'><input class='form-control' type='text' value='" + data.author + "'></td>" +
+                    "<td class='book-edit-cell p-1 align-middle d-none' maxlength='200'><input class='form-control' name='author' type='text' value='" + data.author + "'></td>" +
                 "</tr>" +
                 "<tr class='bg-light'>" +
                     "<td> title: </td>" +
                     "<td class='book-info-cell' >" + data.title + "</td>" +
-                    "<td class='book-edit-cell p-1 align-middle d-none' maxlength='200'><input class='form-control' type='text' value='" + data.title + "'></td>" +
+                    "<td class='book-edit-cell p-1 align-middle d-none' maxlength='200'><input class='form-control' name='title' type='text' value='" + data.title + "'></td>" +
                 "</tr>" +
                 "<tr class='bg-light'>" +
                     "<td> publisher: </td>" +
                 "<td class='book-info-cell' >" + data.publisher + "</td>" +
-                "<td class='book-edit-cell p-1 align-middle d-none' maxlength='200'><input class='form-control' type='text' value='" + data.publisher + "'></td>" +
+                "<td class='book-edit-cell p-1 align-middle d-none' maxlength='200'><input class='form-control' name='publisher' type='text' value='" + data.publisher + "'></td>" +
                 "</tr>" +
                 "<tr class='bg-light'>" +
                     "<td> genre: </td>" +
                     "<td class='book-info-cell' >" + genreFromNumbers(data.genre) + "</td>" +
-                    "<td class='book-edit-cell p-1 align-middle d-none'><select class='form-control'>" + generateGenreOptions(data.genre) + "</select></td>" +
+                    "<td class='book-edit-cell p-1 align-middle d-none'><select class='form-control' name='genre'>" + generateGenreOptions(data.genre) + "</select></td>" +
                     "</tr>" +
                 "<tr class='bg-light'>" +
                     "<td> isbn: </td>" +
                     "<td class='book-info-cell' >" + data.isbn + "</td>" +
-                    "<td class='book-edit-cell p-1 align-middle d-none'><input maxlength='17' class='form-control' type='text' value='" + data.isbn + "'></td>" +
+                    "<td class='book-edit-cell p-1 align-middle d-none'><input maxlength='17' class='form-control' name='isbn' type='text' value='" + data.isbn + "'></td>" +
                     "</tr>" +
             "</table>" +
             "<div class='s-book-buttons'>" +
