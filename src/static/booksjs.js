@@ -167,7 +167,6 @@ function loadSingleBookInfo(id, row) {
                 let name = $(this).attr("name");
                 let value = $(this).val();
                 data[name] = value;
-                console.log(name + ": " + value);
             });
             data['genre'] = $('select[name="genre"]').val();
             return data;
