@@ -152,6 +152,7 @@ function loadSingleBookInfo(id, row) {
                         console.log("success - updateSaveBookButton()");
                         info.empty();
                         successloadSingleBookInfo(data);
+                        updateClickableRow(id, data);
                     })
                     .fail(function (data) {
                         console.log("error - updateSaveBookButton(). data: " + data['responseText']);
@@ -171,6 +172,13 @@ function loadSingleBookInfo(id, row) {
             });
             data['genre'] = $('select[name="genre"]').val();
             return data;
+        }
+
+        function updateClickableRow(id, data) {
+            let selector = ".clickable-row[data-bookid='" + id + "']";
+            let mainTr = $(selector);
+            mainTr.children().eq(0).text(data.author);
+            mainTr.children().eq(1).text(data.title);
         }
 
         function showEditErrors(data, div) {
@@ -213,17 +221,17 @@ function getSingleBookInfoDiv(data) {
                 "<tr class='bg-light'>" +
                     "<td> author: </td>" +
                     "<td class='book-info-cell' >" + data.author + "</td>" +
-                    "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='author' type='text' value='" + data.author + "'></td>" +
+                    "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='author' placeholder='Author' type='text' value='" + data.author + "'></td>" +
                 "</tr>" +
                 "<tr class='bg-light'>" +
                     "<td> title: </td>" +
                     "<td class='book-info-cell' >" + data.title + "</td>" +
-                    "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='title' type='text' value='" + data.title + "'></td>" +
+                    "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='title' placeholder='Title' type='text' value='" + data.title + "'></td>" +
                 "</tr>" +
                 "<tr class='bg-light'>" +
                     "<td> publisher: </td>" +
                 "<td class='book-info-cell' >" + data.publisher + "</td>" +
-                "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='publisher' type='text' value='" + data.publisher + "'></td>" +
+                "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='publisher' type='text' placeholder='Publisher' value='" + data.publisher + "'></td>" +
                 "</tr>" +
                 "<tr class='bg-light'>" +
                     "<td> genre: </td>" +
@@ -233,7 +241,7 @@ function getSingleBookInfoDiv(data) {
                 "<tr class='bg-light'>" +
                     "<td> isbn: </td>" +
                     "<td class='book-info-cell' >" + data.isbn + "</td>" +
-                    "<td class='book-edit-cell p-1 align-middle d-none'><input maxlength='17' class='form-control' name='isbn' type='text' value='" + data.isbn + "'></td>" +
+                    "<td class='book-edit-cell p-1 align-middle d-none'><input maxlength='17' class='form-control' name='isbn' placeholder='ISBN' type='text' value='" + data.isbn + "'></td>" +
                     "</tr>" +
             "</table>" +
             "<div class='s-book-buttons'>" +
