@@ -155,6 +155,7 @@ function loadSingleBookInfo(id, row) {
                     })
                     .fail(function (data) {
                         console.log("error - updateSaveBookButton(). data: " + data['responseText']);
+                        showEditErrors(data, div);
                     })
                     .always(function () {
                         console.log("complete - updateSaveBookButton()");
@@ -170,6 +171,22 @@ function loadSingleBookInfo(id, row) {
             });
             data['genre'] = $('select[name="genre"]').val();
             return data;
+        }
+
+        function showEditErrors(data, div) {
+            $.each(div.find('input, select'), function() {
+                $(this).removeClass('is-invalid');
+            });
+
+            let errors = $.parseJSON(data['responseText']);
+            $.each(errors, function(key, values) {
+                let failedElement = $('input[name="' + key + '"], select[name="' + key + '"]');
+                let errorInfo = $("<small class='text-danger'>" +  "Must be 8-20 characters long." + "</small>");
+                console.log(failedElement);
+                failedElement.addClass('is-invalid');
+                failedElement.tooltip({title: values.join(". ")});
+                failedElement.tooltip('show');
+            });
         }
     }
 
@@ -196,17 +213,17 @@ function getSingleBookInfoDiv(data) {
                 "<tr class='bg-light'>" +
                     "<td> author: </td>" +
                     "<td class='book-info-cell' >" + data.author + "</td>" +
-                    "<td class='book-edit-cell p-1 align-middle d-none' maxlength='200'><input class='form-control' name='author' type='text' value='" + data.author + "'></td>" +
+                    "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='author' type='text' value='" + data.author + "'></td>" +
                 "</tr>" +
                 "<tr class='bg-light'>" +
                     "<td> title: </td>" +
                     "<td class='book-info-cell' >" + data.title + "</td>" +
-                    "<td class='book-edit-cell p-1 align-middle d-none' maxlength='200'><input class='form-control' name='title' type='text' value='" + data.title + "'></td>" +
+                    "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='title' type='text' value='" + data.title + "'></td>" +
                 "</tr>" +
                 "<tr class='bg-light'>" +
                     "<td> publisher: </td>" +
                 "<td class='book-info-cell' >" + data.publisher + "</td>" +
-                "<td class='book-edit-cell p-1 align-middle d-none' maxlength='200'><input class='form-control' name='publisher' type='text' value='" + data.publisher + "'></td>" +
+                "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='publisher' type='text' value='" + data.publisher + "'></td>" +
                 "</tr>" +
                 "<tr class='bg-light'>" +
                     "<td> genre: </td>" +
