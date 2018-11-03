@@ -83,23 +83,27 @@ function loadSingleBookInfo(id, row) {
     let info = row.next().find('.book-info');
 
     if (info.children().length == 0) {
-        $.ajax(
-            {
-                url: 'book/' + id,
-                data: {},
-                type: "GET",
-                dataType: "json",
-                success: function (data) {
-                    console.log("success - loadSingleBookInfo()");
-                    successloadSingleBookInfo(data);
-                },
-                error: function () {
-                    console.log("error - loadSingleBookInfo()");
-                },
-                complete: function () {
-                    console.log("complete - loadSingleBookInfo()");
-                }
-            });
+        if (id != -1) {
+            $.ajax(
+                {
+                    url: 'book/' + id,
+                    data: {},
+                    type: "GET",
+                    dataType: "json",
+                    success: function (data) {
+                        console.log("success - loadSingleBookInfo()");
+                        successloadSingleBookInfo(data);
+                    },
+                    error: function () {
+                        console.log("error - loadSingleBookInfo()");
+                    },
+                    complete: function () {
+                        console.log("complete - loadSingleBookInfo()");
+                    }
+                });
+        } else {
+            showNewBook(info);
+        }
     }
 
     function successloadSingleBookInfo(data) {
@@ -145,10 +149,11 @@ function loadSingleBookInfo(id, row) {
 
     function updateSaveBookButton(div, id, data) {
         $(div).find(".save-book-button").click(function () {
-            $.ajax({
+                $.ajax({
                     url: 'book/' + id,
                     data: editInputsToJson(div),
-                    type: "PUT"})
+                    type: "PUT"
+                })
                     .done(function (data) {
                         console.log("success - updateSaveBookButton()");
                         info.empty();
@@ -293,6 +298,27 @@ function confirmedDeleteBookButtonAction() {
 
 }
 
+function showNewBook(info) {
+    console.log('dupa');
+    data = {
+        author: '',
+        title: '',
+        publisher: '',
+        genre: '',
+        isbn: ''
+    };
+    let div = getSingleBookInfoDiv(data);
+    $.each($(div).find(".book-info-cell, .book-edit-cell"), function () {
+            $(this).toggleClass("d-none");
+    });
+    $(div).find("select").prepend($("<option disabled selected value> -- select an option -- </option>"));
+    $(div).siblings(".s-book-buttons").children().remove();
+    console.log(div);
+    info.append(div);
+    div.find(".s-book-buttons").empty();
+}
+
+
 function addNewBookRow() {
     let tbody = $('#booksTable > tbody');
     let titleAuthorRow = $(
@@ -300,14 +326,12 @@ function addNewBookRow() {
             "<td colspan='2'> ADD NEW BOOK </td>" +
         "</tr>"
     );
-
     let contentRow = $(
         "<tr class='bg-light d-none'>" +
             "<td class='book-info container' colspan=2>" +
             "</td>" +
         "</tr>"
     );
-
     let emptyRow = $("<tr style='display:none;'></tr>");
 
     tbody.append([titleAuthorRow, contentRow, emptyRow]);
