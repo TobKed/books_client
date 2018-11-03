@@ -299,7 +299,6 @@ function confirmedDeleteBookButtonAction() {
 }
 
 function showNewBook(info) {
-    console.log('dupa');
     data = {
         author: '',
         title: '',
@@ -313,7 +312,6 @@ function showNewBook(info) {
     });
     $(div).find("select").prepend($("<option disabled selected value> -- select an option -- </option>"));
     $(div).siblings(".s-book-buttons").children().remove();
-    console.log(div);
     info.append(div);
     div.find(".s-book-buttons").empty();
 }
