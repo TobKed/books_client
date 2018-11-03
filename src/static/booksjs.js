@@ -102,7 +102,7 @@ function loadSingleBookInfo(id, row) {
                     }
                 });
         } else {
-            showNewBook(info);
+            showNewBookFields(info);
         }
     }
 
@@ -298,7 +298,7 @@ function confirmedDeleteBookButtonAction() {
 
 }
 
-function showNewBook(info) {
+function showNewBookFields(info) {
     data = {
         author: '',
         title: '',
@@ -311,9 +311,18 @@ function showNewBook(info) {
             $(this).toggleClass("d-none");
     });
     $(div).find("select").prepend($("<option disabled selected value> -- select an option -- </option>"));
-    $(div).siblings(".s-book-buttons").children().remove();
+    let buttonsDiv = $(div).siblings(".s-book-buttons");
+    buttonsDiv.children().remove();
     info.append(div);
-    div.find(".s-book-buttons").empty();
+    buttonsDiv.append($("<div class='add-buttons'>" +
+                            "<button type='button' class='btn btn-info mx-2' id='add-book-button'>Add</button>" +
+                            "<button type='button' class='btn btn-secondary mx-2' id='cancel-add-book-button'>Cancel</button>" +
+                        "</div>"));
+    let cancelBUtton = buttonsDiv.find("#cancel-add-book-button");
+    cancelBUtton.click(function() {
+        console.log($(this).closest("tr"));
+        $(this).closest("tr").toggleClass("d-none");
+    })
 }
 
 
