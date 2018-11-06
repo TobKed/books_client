@@ -1,6 +1,6 @@
 {% extends "books/base.html" %}
+{% load static %}
 {% block content %}
-
 
 <td class="table-responsive mt-3">
 
@@ -39,3 +39,7 @@
 </div>
 
 {% endblock content %}
+
+{% block js %}
+    <script src="{% static 'booksjs.js' %}"></script>
+{% endblock %}
