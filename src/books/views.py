@@ -54,3 +54,6 @@ class BookView(APIView):
 
 def home(request):
     return render(request, 'books/home.html')
+
+def home_2(request):
+    return render(request, 'books/home_2.html')

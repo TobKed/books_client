@@ -1,0 +1,45 @@
+{% extends "books/base.html" %}
+{% load static %}
+{% block content %}
+
+<td class="table-responsive mt-3">
+
+    <table id="booksTable" class="table table-bordered table-striped table-hover">
+        <thead>
+            <th>Author</th>
+            <th>Title</th>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <div class="clearfix"></div>
+
+</div>
+
+<!-- DELETE Modal -->
+<div class="modal fade" id="confirmBookRemoveModal" tabindex="-1" role="dialog" aria-labelledby="confirmBookRemoveModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmBookRemoveModalLabel">Warning</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Do you want to delete book? <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button id="deleteBookConfirmed" type="submit" class="btn btn-danger">Delete book</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block js %}
+    <script src="{% static 'booksjs2.js' %}"></script>
+{% endblock %}
