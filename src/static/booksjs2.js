@@ -1,5 +1,6 @@
 $(document).ready(function () {
-    console.log("test");
+    let allBooksData = ajaxCall({success: fillBooksTable});
+    confirmedDeleteBookButtonAction();  // action binding when book deletion is confirmed
 });
 
 let DEBUG = true;
@@ -43,4 +44,71 @@ function ajaxCall({bookId = "",
     if ((dataType != null) && (dataType !== undefined)) ajaxSettings.dataType = dataType;
 
     $.ajax(ajaxSettings);
+}
+
+
+class singleBookElements {
+    constructor({newRowData = null} = {}) {
+        if (newRowData) {
+            this.titleAuthorRow = $(
+                "<tr class='clickable-row' data-bookId=" + newRowData.id + ">" +
+                "<td>" + newRowData.author + "</td>" +
+                "<td>" + newRowData.title + "</td>" +
+                "</tr>"
+            );
+
+            this.contentRow = $(
+                "<tr class='bg-light d-none content-row'>" +
+                "<td class='book-info container' colspan=2>" +
+                "</td>" +
+                "</tr>"
+            );
+
+            this.emptyRow = $("<tr class='fill-empty-row d-none'></tr>");
+            // this.makeRowClickable(this.titleAuthorRow);
+            this.constructor.makeRowClickable(this.titleAuthorRow);
+        }
+    }
+
+    static makeRowClickable(row) {
+        row.click(function () {
+            $(this).toggleClass("bg-info text-white");
+            $(this).next().toggleClass("d-none");
+        });
+        row.css('cursor', 'pointer')
+    }
+
+    getSubElements() {return [this.titleAuthorRow, this.contentRow, this.emptyRow]}
+}
+
+
+function fillBooksTable(data) {
+    let tbody = $("#booksTable > tbody");
+    $.each(data, function (key, val) {
+        let singleBook = new singleBookElements({newRowData: val});
+        tbody.append(singleBook.getSubElements());
+    });
+}
+
+
+function confirmedDeleteBookButtonAction() {
+    // http://webroxtar.com/2011/10/solution-jquery-click-event-gets-called-twice-fires-twice/
+    $('#deleteBookConfirmed').unbind('click').click(function () {
+        let id = $(this).attr("data-bookid");
+        ajaxCall({
+            bookId: id,
+            success: function () {
+                $('#confirmBookRemoveModal').modal('hide');
+                deleteBookTrs(id);
+            }
+        })
+    });
+
+    function deleteBookTrs(id) {
+        let selector = ".clickable-row[data-bookid='" + id + "']";
+        let mainTr = $(selector);
+        mainTr.next(".fill-empty-row").remove();
+        mainTr.next(".book-info").remove();
+        mainTr.remove();
+    }
 }
