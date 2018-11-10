@@ -1,19 +1,35 @@
 $(document).ready(function () {
-    let allBooksData = ajaxCall({success: fillBooksTable});
+    ajaxCall({success: fillBooksTable});
     confirmedDeleteBookButtonAction();  // action binding when book deletion is confirmed
 });
 
 let DEBUG = true;
-let ENDPOINTURL = "http://localhost:8000/book/";
+const ENDPOINTURL = "http://localhost:8000/book/";
 
 let GENRES = {
-    1: "Romans",
-    2: "Obyczajowa",
-    3: "Sci-fi i fantasy",
-    4: "Literatura faktu",
-    5: "Popularnonaukowa",
-    6: "Poradnik",
-    7: "Kryminał, sensacja"
+    genres: {
+        1: "Romans",
+        2: "Obyczajowa",
+        3: "Sci-fi i fantasy",
+        4: "Literatura faktu",
+        5: "Popularnonaukowa",
+        6: "Poradnik",
+        7: "Kryminał, sensacja"
+    },
+
+    genreFromNumbers(num) {
+        return this.genres.hasOwnProperty(num) ? this.genres[num] : null;
+    },
+
+    generateGenreOptions(num) {
+        let rv = "";
+        $.each(this.genres, function(genreNum, genreName) {
+            rv += "<option value='" + genreNum + "'";
+            if (genreNum == num) rv += "selected";
+            rv += ">" + genreName + "</option>";
+        });
+        return rv;
+    }
 };
 
 function ajaxCall({bookId = "",
@@ -65,7 +81,6 @@ class singleBookElements {
             );
 
             this.emptyRow = $("<tr class='fill-empty-row d-none'></tr>");
-            // this.makeRowClickable(this.titleAuthorRow);
             this.constructor.makeRowClickable(this.titleAuthorRow);
         }
     }
