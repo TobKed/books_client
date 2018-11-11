@@ -148,52 +148,66 @@ class SingleBookElements {
 
 
 class SingleBookInfo {
-    constructor ({newData=null} = {}) {
-        if (newData==null) newData = {
-            author: '',
-            title: '',
-            publisher: '',
-            genre: '',
-            isbn: ''
-        };
-        this.info = $("<table class='table mb-2 book-info-table'>" +
-               "<tr class='bg-light'>" +
-                   "<td> author: </td>" +
-                   "<td class='book-info-cell' >" + newData.author + "</td>" +
-                   "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='author' placeholder='Author' type='text' value='" + newData.author + "'></td>" +
-               "</tr>" +
-               "<tr class='bg-light'>" +
-                   "<td> title: </td>" +
-                   "<td class='book-info-cell' >" + newData.title + "</td>" +
-                   "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='title' placeholder='Title' type='text' value='" + newData.title + "'></td>" +
-               "</tr>" +
-               "<tr class='bg-light'>" +
-                   "<td> publisher: </td>" +
-                   "<td class='book-info-cell' >" + newData.publisher + "</td>" +
-                   "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='publisher' type='text' placeholder='Publisher' value='" + newData.publisher + "'></td>" +
-               "</tr>" +
-               "<tr class='bg-light'>" +
-                   "<td> genre: </td>" +
-                   "<td class='book-info-cell' >" + GENRES.genreFromNumbers(newData.genre) + "</td>" +
-                   "<td class='book-edit-cell p-1 align-middle d-none'><select class='form-control' name='genre'>" + GENRES.generateGenreOptions(newData.genre) + "</select></td>" +
-                   "</tr>" +
-               "<tr class='bg-light'>" +
-                   "<td> isbn: </td>" +
-                   "<td class='book-info-cell' >" + newData.isbn + "</td>" +
-                   "<td class='book-edit-cell p-1 align-middle d-none'><input maxlength='17' class='form-control' name='isbn' placeholder='ISBN' type='text' value='" + newData.isbn + "'></td>" +
-               "</tr>" +
-           "</table>" +
-           "<div class='s-book-buttons'>" +
-               "<div class=''>" +
-                   "<button type='button' class='btn btn-info mx-2 edit-book-button'>Edit</button>" +
-                   "<button type='button' class='btn btn-danger mx-2 delete-book-button' data-toggle='modal' data-target='#confirmBookRemoveModal'>Delete</button>" +
-               "</div>" +
-               "<div class='d-none'>" +
-                   "<button type='button' class='btn btn-info mx-2 save-book-button'>Save</button>" +
-                   "<button type='button' class='btn btn-secondary mx-2 cancel-edit-book-button'>Cancel</button>" +
-               "</div>" +
-           "</div>"
-        )
+    constructor ({newData=null, existingInfo=null} = {}) {
+        if (existingInfo == null) {
+            if (newData == null) newData = {
+                author: '',
+                title: '',
+                publisher: '',
+                genre: '',
+                isbn: ''
+            };
+            this.info = $(
+                "<table class='table mb-2 book-info-table'>" +
+                    "<tr class='bg-light'>" +
+                        "<td> author: </td>" +
+                        "<td class='book-info-cell' >" + newData.author + "</td>" +
+                        "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='author' placeholder='Author' type='text' value='" + newData.author + "'></td>" +
+                    "</tr>" +
+                    "<tr class='bg-light'>" +
+                        "<td> title: </td>" +
+                        "<td class='book-info-cell' >" + newData.title + "</td>" +
+                        "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='title' placeholder='Title' type='text' value='" + newData.title + "'></td>" +
+                    "</tr>" +
+                    "<tr class='bg-light'>" +
+                        "<td> publisher: </td>" +
+                        "<td class='book-info-cell' >" + newData.publisher + "</td>" +
+                        "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='publisher' type='text' placeholder='Publisher' value='" + newData.publisher + "'></td>" +
+                    "</tr>" +
+                    "<tr class='bg-light'>" +
+                        "<td> genre: </td>" +
+                        "<td class='book-info-cell' >" + GENRES.genreFromNumbers(newData.genre) + "</td>" +
+                        "<td class='book-edit-cell p-1 align-middle d-none'><select class='form-control' name='genre'>" + GENRES.generateGenreOptions(newData.genre) + "</select></td>" +
+                    "</tr>" +
+                    "<tr class='bg-light'>" +
+                        "<td> isbn: </td>" +
+                        "<td class='book-info-cell' >" + newData.isbn + "</td>" +
+                        "<td class='book-edit-cell p-1 align-middle d-none'><input maxlength='17' class='form-control' name='isbn' placeholder='ISBN' type='text' value='" + newData.isbn + "'></td>" +
+                    "</tr>" +
+                "</table>" +
+                "<div class='s-book-buttons'>" +
+                    "<div class='book-edit-delete-buttons'>" +
+                        "<button type='button' class='btn btn-info mx-2 edit-book-button'>Edit</button>" +
+                        "<button type='button' class='btn btn-danger mx-2 delete-book-button' data-toggle='modal' data-target='#confirmBookRemoveModal'>Delete</button>" +
+                    "</div>" +
+                    "<div class='book-save-cancel-buttons d-none'>" +
+                        "<button type='button' class='btn btn-info mx-2 save-book-button'>Save</button>" +
+                        "<button type='button' class='btn btn-secondary mx-2 cancel-edit-book-button'>Cancel</button>" +
+                    "</div>" +
+                    "<div class='book-add-cancel-buttons d-none'>" +
+                        "<button type='button' class='btn btn-info mx-2 save-book-button'>Add</button>" +
+                        "<button type='button' class='btn btn-secondary mx-2 cancel-edit-book-button'>Cancel</button>" +
+                    "</div>" +
+                "</div>"
+            );
+        }
+
+        this.infoCells = $(this.info).find("table > .book-info-cell");
+        this.editCells = $(this.info).find("table > .book-edit-cell");
+        this.editDeleteButtons = $(this.info).find(".s-book-buttons > .book-edit-delete-buttons");
+        this.saveCancelButtons = $(this.info).find(".s-book-buttons > .book-save-cancel-buttons");
+        this.addCancelButtons = $(this.info).find(".s-book-buttons > .book-add-cancel-buttons");
+
     }
 
 }
