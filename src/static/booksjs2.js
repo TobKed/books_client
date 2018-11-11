@@ -3,6 +3,8 @@ $(document).ready(function () {
     confirmedDeleteBookButtonAction();  // action binding when book deletion is confirmed
 });
 
+
+/* VARIABLES */
 let DEBUG = true;
 const ENDPOINTURL = "http://localhost:8000/book/";
 
@@ -32,6 +34,8 @@ let GENRES = {
     }
 };
 
+
+/* FUNCTIONS */
 function ajaxCall({bookId = "",
                   type = "GET",
                   dataType ="json",
@@ -63,44 +67,10 @@ function ajaxCall({bookId = "",
 }
 
 
-class singleBookElements {
-    constructor({newRowData = null} = {}) {
-        if (newRowData) {
-            this.titleAuthorRow = $(
-                "<tr class='clickable-row' data-bookId=" + newRowData.id + ">" +
-                "<td>" + newRowData.author + "</td>" +
-                "<td>" + newRowData.title + "</td>" +
-                "</tr>"
-            );
-
-            this.contentRow = $(
-                "<tr class='bg-light d-none content-row'>" +
-                "<td class='book-info container' colspan=2>" +
-                "</td>" +
-                "</tr>"
-            );
-
-            this.emptyRow = $("<tr class='fill-empty-row d-none'></tr>");
-            this.constructor.makeRowClickable(this.titleAuthorRow);
-        }
-    }
-
-    static makeRowClickable(row) {
-        row.click(function () {
-            $(this).toggleClass("bg-info text-white");
-            $(this).next().toggleClass("d-none");
-        });
-        row.css('cursor', 'pointer')
-    }
-
-    getSubElements() {return [this.titleAuthorRow, this.contentRow, this.emptyRow]}
-}
-
-
 function fillBooksTable(data) {
     let tbody = $("#booksTable > tbody");
     $.each(data, function (key, val) {
-        let singleBook = new singleBookElements({newRowData: val});
+        let singleBook = new SingleBookElements({newRowData: val});
         tbody.append(singleBook.getSubElements());
     });
 }
@@ -114,16 +84,117 @@ function confirmedDeleteBookButtonAction() {
             bookId: id,
             success: function () {
                 $('#confirmBookRemoveModal').modal('hide');
-                deleteBookTrs(id);
+                let bookToDelete = new SingleBookElements({bookId:id});
+                bookToDelete.delete();
+                bookToDelete = undefined;
             }
         })
     });
+}
 
-    function deleteBookTrs(id) {
-        let selector = ".clickable-row[data-bookid='" + id + "']";
-        let mainTr = $(selector);
-        mainTr.next(".fill-empty-row").remove();
-        mainTr.next(".book-info").remove();
-        mainTr.remove();
+
+/* CLASSES */
+class SingleBookElements {
+    constructor({newRowData = null, bookId = null, newBook=null} = {}) {
+        if (newRowData) {
+            this.titleAuthorRow = $(
+                "<tr class='clickable-row' data-bookId=" + newRowData.id + ">" +
+                    "<td>" + newRowData.author + "</td>" +
+                    "<td>" + newRowData.title + "</td>" +
+                "</tr>"
+            );
+
+            this.contentRow = $(
+                "<tr class='content-row bg-light d-none'>" +
+                    "<td class='book-info container' colspan=2></td>" +
+                "</tr>"
+            );
+
+            this.emptyRow = $("<tr class='fill-empty-row d-none'></tr>");
+            this.makeRowClickable();
+        } else if (bookId) {
+            let selector = ".clickable-row[data-bookid='" + bookId + "']";
+            this.titleAuthorRow = $(selector);
+            this.contentRow = this.titleAuthorRow.next(".book-info");
+            this.emptyRow = this.titleAuthorRow.next(".fill-empty-row");
+        }
+    }
+
+    makeRowClickable() {
+        this.titleAuthorRow.click(function () {
+            $(this).toggleClass("bg-info text-white");
+            let contentRow = $(this).next(".content-row");
+            contentRow.toggleClass("d-none");
+            if (contentRow.children(".book-info").children().length === 0) {
+                let bookId = $(this).attr("data-bookid");
+                console.log('load book info (id: ' + bookId + ")");
+                ajaxCall({bookId:bookId, success:function(data) {
+                        let bookInfo = new SingleBookInfo({newData:data});
+                        contentRow.children(".book-info").html(bookInfo.info);
+                    }})
+            }
+        });
+        this.titleAuthorRow.css('cursor', 'pointer')
+    }
+
+    getSubElements() {return [this.titleAuthorRow, this.contentRow, this.emptyRow]}
+
+    delete() {
+        this.titleAuthorRow.remove();
+        this.contentRow.remove();
+        this.emptyRow.remove();
     }
 }
+
+
+class SingleBookInfo {
+    constructor ({newData=null} = {}) {
+        if (newData==null) newData = {
+            author: '',
+            title: '',
+            publisher: '',
+            genre: '',
+            isbn: ''
+        };
+        this.info = $("<table class='table mb-2 book-info-table'>" +
+               "<tr class='bg-light'>" +
+                   "<td> author: </td>" +
+                   "<td class='book-info-cell' >" + newData.author + "</td>" +
+                   "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='author' placeholder='Author' type='text' value='" + newData.author + "'></td>" +
+               "</tr>" +
+               "<tr class='bg-light'>" +
+                   "<td> title: </td>" +
+                   "<td class='book-info-cell' >" + newData.title + "</td>" +
+                   "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='title' placeholder='Title' type='text' value='" + newData.title + "'></td>" +
+               "</tr>" +
+               "<tr class='bg-light'>" +
+                   "<td> publisher: </td>" +
+                   "<td class='book-info-cell' >" + newData.publisher + "</td>" +
+                   "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='publisher' type='text' placeholder='Publisher' value='" + newData.publisher + "'></td>" +
+               "</tr>" +
+               "<tr class='bg-light'>" +
+                   "<td> genre: </td>" +
+                   "<td class='book-info-cell' >" + GENRES.genreFromNumbers(newData.genre) + "</td>" +
+                   "<td class='book-edit-cell p-1 align-middle d-none'><select class='form-control' name='genre'>" + GENRES.generateGenreOptions(newData.genre) + "</select></td>" +
+                   "</tr>" +
+               "<tr class='bg-light'>" +
+                   "<td> isbn: </td>" +
+                   "<td class='book-info-cell' >" + newData.isbn + "</td>" +
+                   "<td class='book-edit-cell p-1 align-middle d-none'><input maxlength='17' class='form-control' name='isbn' placeholder='ISBN' type='text' value='" + newData.isbn + "'></td>" +
+               "</tr>" +
+           "</table>" +
+           "<div class='s-book-buttons'>" +
+               "<div class=''>" +
+                   "<button type='button' class='btn btn-info mx-2 edit-book-button'>Edit</button>" +
+                   "<button type='button' class='btn btn-danger mx-2 delete-book-button' data-toggle='modal' data-target='#confirmBookRemoveModal'>Delete</button>" +
+               "</div>" +
+               "<div class='d-none'>" +
+                   "<button type='button' class='btn btn-info mx-2 save-book-button'>Save</button>" +
+                   "<button type='button' class='btn btn-secondary mx-2 cancel-edit-book-button'>Cancel</button>" +
+               "</div>" +
+           "</div>"
+        )
+    }
+
+}
+
