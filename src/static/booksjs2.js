@@ -82,6 +82,7 @@ function confirmedDeleteBookButtonAction() {
         let id = $(this).attr("data-bookid");
         ajaxCall({
             bookId: id,
+            type: "DELETE",
             success: function () {
                 $('#confirmBookRemoveModal').modal('hide');
                 let bookToDelete = new SingleBookElements({bookId:id});
@@ -105,7 +106,7 @@ class SingleBookElements {
             );
 
             this.contentRow = $(
-                "<tr class='content-row bg-light d-none'>" +
+                "<tr class='content-row bg-light d-none' data-bookId=" + newRowData.id + ">" +
                     "<td class='book-info container' colspan=2></td>" +
                 "</tr>"
             );
@@ -115,8 +116,8 @@ class SingleBookElements {
         } else if (bookId) {
             let selector = ".clickable-row[data-bookid='" + bookId + "']";
             this.titleAuthorRow = $(selector);
-            this.contentRow = this.titleAuthorRow.next(".book-info");
-            this.emptyRow = this.titleAuthorRow.next(".fill-empty-row");
+            this.contentRow = this.titleAuthorRow.nextAll(".content-row:first");
+            this.emptyRow = this.titleAuthorRow.nextAll(".fill-empty-row:first");
         }
     }
 
@@ -140,9 +141,9 @@ class SingleBookElements {
     getSubElements() {return [this.titleAuthorRow, this.contentRow, this.emptyRow]}
 
     delete() {
-        this.titleAuthorRow.remove();
-        this.contentRow.remove();
         this.emptyRow.remove();
+        this.contentRow.remove();
+        this.titleAuthorRow.remove();
     }
 }
 
@@ -159,27 +160,27 @@ class SingleBookInfo {
             };
             this.info = $(
                 "<table class='table mb-2 book-info-table'>" +
-                    "<tr class='bg-light'>" +
+                    "<tr class='bg-light book-author'>" +
                         "<td> author: </td>" +
                         "<td class='book-info-cell' >" + newData.author + "</td>" +
                         "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='author' placeholder='Author' type='text' value='" + newData.author + "'></td>" +
                     "</tr>" +
-                    "<tr class='bg-light'>" +
+                    "<tr class='bg-light book-title'>" +
                         "<td> title: </td>" +
                         "<td class='book-info-cell' >" + newData.title + "</td>" +
                         "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='title' placeholder='Title' type='text' value='" + newData.title + "'></td>" +
                     "</tr>" +
-                    "<tr class='bg-light'>" +
+                    "<tr class='bg-light book-publisher'>" +
                         "<td> publisher: </td>" +
                         "<td class='book-info-cell' >" + newData.publisher + "</td>" +
                         "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='publisher' type='text' placeholder='Publisher' value='" + newData.publisher + "'></td>" +
                     "</tr>" +
-                    "<tr class='bg-light'>" +
+                    "<tr class='bg-light book-genre'>" +
                         "<td> genre: </td>" +
                         "<td class='book-info-cell' >" + GENRES.genreFromNumbers(newData.genre) + "</td>" +
                         "<td class='book-edit-cell p-1 align-middle d-none'><select class='form-control' name='genre'>" + GENRES.generateGenreOptions(newData.genre) + "</select></td>" +
                     "</tr>" +
-                    "<tr class='bg-light'>" +
+                    "<tr class='bg-light book-isbn'>" +
                         "<td> isbn: </td>" +
                         "<td class='book-info-cell' >" + newData.isbn + "</td>" +
                         "<td class='book-edit-cell p-1 align-middle d-none'><input maxlength='17' class='form-control' name='isbn' placeholder='ISBN' type='text' value='" + newData.isbn + "'></td>" +
@@ -204,9 +205,20 @@ class SingleBookInfo {
 
         this.infoCells = $(this.info).find("table > .book-info-cell");
         this.editCells = $(this.info).find("table > .book-edit-cell");
-        this.editDeleteButtons = $(this.info).find(".s-book-buttons > .book-edit-delete-buttons");
-        this.saveCancelButtons = $(this.info).find(".s-book-buttons > .book-save-cancel-buttons");
-        this.addCancelButtons = $(this.info).find(".s-book-buttons > .book-add-cancel-buttons");
+        this.editDeleteButtons = $(this.info).find(".book-edit-delete-buttons");
+        this.saveCancelButtons = $(this.info).find(".book-save-cancel-buttons");
+        this.addCancelButtons = $(this.info).find(".book-add-cancel-buttons");
+
+        this.editDeleteButtons.children(".delete-book-button").click(function() {
+            console.log("test");
+            let body = $("#confirmBookRemoveModal").find(".modal-body");
+            let contentRow = $(this).closest(".content-row");
+            let id = contentRow.attr("data-bookid");
+            let author = contentRow.find(".book-author > .book-info-cell").first().text();
+            let title = contentRow.find(".book-title > .book-info-cell").first().text();
+            body.html("Do you want to delete book: " + author + " - " + title + " ?<br>");
+            $("#deleteBookConfirmed").attr('data-bookid', id);
+        })
 
     }
 
