@@ -150,6 +150,7 @@ class SingleBookElements {
 
 class SingleBookInfo {
     constructor ({newData=null, existingInfo=null} = {}) {
+        let obj = this;
         if (existingInfo == null) {
             if (newData == null) newData = {
                 author: '',
@@ -188,29 +189,28 @@ class SingleBookInfo {
                 "</table>" +
                 "<div class='s-book-buttons'>" +
                     "<div class='book-edit-delete-buttons'>" +
-                        "<button type='button' class='btn btn-info mx-2 edit-book-button'>Edit</button>" +
-                        "<button type='button' class='btn btn-danger mx-2 delete-book-button' data-toggle='modal' data-target='#confirmBookRemoveModal'>Delete</button>" +
+                        "<button type='button' class='edit-book-button btn btn-info mx-2'>Edit</button>" +
+                        "<button type='button' class='delete-book-button btn btn-danger mx-2' data-toggle='modal' data-target='#confirmBookRemoveModal'>Delete</button>" +
                     "</div>" +
                     "<div class='book-save-cancel-buttons d-none'>" +
-                        "<button type='button' class='btn btn-info mx-2 save-book-button'>Save</button>" +
-                        "<button type='button' class='btn btn-secondary mx-2 cancel-edit-book-button'>Cancel</button>" +
+                        "<button type='button' class='save-book-button btn btn-info mx-2'>Save</button>" +
+                        "<button type='button' class='cancel-edit-book-button btn btn-secondary mx-2'>Cancel</button>" +
                     "</div>" +
                     "<div class='book-add-cancel-buttons d-none'>" +
-                        "<button type='button' class='btn btn-info mx-2 save-book-button'>Add</button>" +
-                        "<button type='button' class='btn btn-secondary mx-2 cancel-edit-book-button'>Cancel</button>" +
+                        "<button type='button' class='save-book-button btn btn-info mx-2'>Add</button>" +
+                        "<button type='button' class='cancel-add-book-button btn btn-secondary mx-2'>Cancel</button>" +
                     "</div>" +
                 "</div>"
             );
         }
 
-        this.infoCells = $(this.info).find("table > .book-info-cell");
-        this.editCells = $(this.info).find("table > .book-edit-cell");
+        this.infoCells = $(this.info).find("td.book-info-cell");
+        this.editCells = $(this.info).find("td.book-edit-cell");
         this.editDeleteButtons = $(this.info).find(".book-edit-delete-buttons");
         this.saveCancelButtons = $(this.info).find(".book-save-cancel-buttons");
         this.addCancelButtons = $(this.info).find(".book-add-cancel-buttons");
 
         this.editDeleteButtons.children(".delete-book-button").click(function() {
-            console.log("test");
             let body = $("#confirmBookRemoveModal").find(".modal-body");
             let contentRow = $(this).closest(".content-row");
             let id = contentRow.attr("data-bookid");
@@ -218,9 +218,25 @@ class SingleBookInfo {
             let title = contentRow.find(".book-title > .book-info-cell").first().text();
             body.html("Do you want to delete book: " + author + " - " + title + " ?<br>");
             $("#deleteBookConfirmed").attr('data-bookid', id);
-        })
+        });
+
+        this.editDeleteButtons.children(".edit-book-button").click(function() {
+            obj.editDeleteButtons.addClass("d-none");
+            obj.infoCells.addClass("d-none");
+            obj.saveCancelButtons.removeClass("d-none");
+            obj.editCells.removeClass("d-none");
+        });
+
+        this.saveCancelButtons.children(".cancel-edit-book-button").click(function() {
+           obj.editDeleteButtons.removeClass("d-none");
+           obj.infoCells.removeClass("d-none");
+           obj.saveCancelButtons.addClass("d-none");
+           obj.editCells.addClass("d-none");
+        });
 
     }
+
+
 
 }
 
