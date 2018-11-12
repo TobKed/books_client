@@ -245,9 +245,9 @@ class SingleBookInfo {
                 data: data,
                 success: function(data) {
                     console.log("edit successful");
+                    /* TODO update content-row title and author*/
                 },
                 error: function(data) {
-                    console.log(data);
                     obj.showEditErrors(data);
                 }
             })
