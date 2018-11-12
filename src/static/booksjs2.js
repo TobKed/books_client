@@ -278,8 +278,9 @@ class SingleBookInfo {
         });
 
         this.addCancelButtons.children(".cancel-add-book-button").click(function() {
-            /* TODO */
-            console.log("test");
+            let contentRow = $(this).closest(".content-row");
+            contentRow.addClass("d-none");
+            $(contentRow).find("input").val("");
         });
 
         function goInfoMode() {
