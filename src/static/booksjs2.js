@@ -234,9 +234,52 @@ class SingleBookInfo {
            obj.editCells.addClass("d-none");
         });
 
+        this.saveCancelButtons.children(".save-book-button").click(function() {
+            console.log(obj.editInputsToJson());
+            let contentRow = $(this).closest(".content-row");
+            let id = contentRow.attr("data-bookid");
+            let data = obj.editInputsToJson();
+            ajaxCall({
+                bookId: id,
+                type: "PUT",
+                data: data,
+                success: function(data) {
+                    console.log("edit successful");
+                },
+                error: function(data) {
+                    console.log(data);
+                    obj.showEditErrors(data);
+                }
+            })
+        });
+
+
     }
 
 
+    editInputsToJson() {
+        let data = {};
+        $.each($(this.info).find(".book-edit-cell > input"), function () {
+            let name = $(this).attr("name");
+            let value = $(this).val();
+            data[name] = value;
+        });
+        data['genre'] = $('select[name="genre"]').val();
+        return data;
+    }
 
+    showEditErrors(data) {
+        $.each($(this).find('input, select'), function() {
+            $(this).removeClass('is-invalid');
+        });
+
+        let errors = $.parseJSON(data['responseText']);
+        $.each(errors, function(key, values) {
+            let failedElement = $('input[name="' + key + '"], select[name="' + key + '"]');
+            failedElement.addClass('is-invalid');
+            failedElement.tooltip({title: values.join(". ")});
+            failedElement.tooltip('show');
+        });
+    }
 }
 
