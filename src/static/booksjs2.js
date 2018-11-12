@@ -234,6 +234,7 @@ class SingleBookInfo {
         this.editDeleteButtons = $(this.info).find(".book-edit-delete-buttons");
         this.saveCancelButtons = $(this.info).find(".book-save-cancel-buttons");
         this.addCancelButtons = $(this.info).find(".book-add-cancel-buttons");
+        this.saveBookButtons = $(this.info).find(".save-book-button");
 
         if (newBook) goAddMode();
 
@@ -243,7 +244,6 @@ class SingleBookInfo {
             let id = contentRow.attr("data-bookid");
             let author = contentRow.find(".book-author > .book-info-cell").first().text();
             let title = contentRow.find(".book-title > .book-info-cell").first().text();
-            console.log(["DUPA" , body, id, author, title]);
             body.html("Do you want to delete book: " + author + " - " + title + " ?<br>");
             $("#deleteBookConfirmed").attr('data-bookid', id);
         });
@@ -252,7 +252,7 @@ class SingleBookInfo {
 
         this.saveCancelButtons.children(".cancel-edit-book-button").click(goInfoMode);
 
-        this.saveCancelButtons.children(".save-book-button").click(function() {
+        this.saveBookButtons.click(function() {
             let contentRow = $(this).closest(".content-row");
             let id = (!newBook) ? contentRow.attr("data-bookid") : "";
             let type = !(newBook) ? "PUT" : "POST";
@@ -263,8 +263,16 @@ class SingleBookInfo {
                 data: data,
                 success: function(data) {
                     if (DEBUG) console.log("edit successful");
-                    obj.updateData(data);
-                    goInfoMode();
+                    if (!newBook) {
+                        obj.updateData(data);
+                        goInfoMode();
+                    } else {
+                        let newBook = new SingleBookElements({newRowData: data});
+                        $(".clickable-row[data-bookid='-1']").before(newBook.getSubElements());
+                        $(obj.editCells).find("input").val("");
+                        $(obj.editCells).closest(".content-row").addClass("d-none");
+                        $(obj.editCells).closest(".content-row").prev().removeClass("bg-info text-white");
+                    }
                 },
                 error: function(data) {
                     obj.showEditErrors(data);
@@ -272,16 +280,10 @@ class SingleBookInfo {
             })
         });
 
-        this.addCancelButtons.children(".save-book-button").click(function() {
-            /* TODO */
-            console.log("test");
-        });
+        this.addCancelButtons.children(".cancel-add-book-button").click(
+            clearInputs
+        );
 
-        this.addCancelButtons.children(".cancel-add-book-button").click(function() {
-            let contentRow = $(this).closest(".content-row");
-            contentRow.addClass("d-none");
-            $(contentRow).find("input").val("");
-        });
 
         function goInfoMode() {
             obj.editDeleteButtons.removeClass("d-none");
@@ -306,16 +308,19 @@ class SingleBookInfo {
             obj.addCancelButtons.removeClass("d-none");
         }
 
+        function clearInputs() {
+            let contentRow = $(this).closest(".content-row");
+            contentRow.addClass("d-none");
+            $(contentRow).find("input").val("");
+        }
+
     }
-
-
 
     editInputsToJson() {
         let data = {};
         $.each($(this.info).find(".book-edit-cell > input"), function () {
             let name = $(this).attr("name");
-            let value = $(this).val();
-            data[name] = value;
+            data[name] = $(this).val();
         });
         data['genre'] = $('select[name="genre"]').val();
         return data;
@@ -356,4 +361,5 @@ class SingleBookInfo {
         clickableRow.children().eq(0).text(data.author);
         clickableRow.children().eq(1).text(data.title);
     };
+
 }
