@@ -128,7 +128,6 @@ class SingleBookElements {
             contentRow.toggleClass("d-none");
             if (contentRow.children(".book-info").children().length === 0) {
                 let bookId = $(this).attr("data-bookid");
-                console.log('load book info (id: ' + bookId + ")");
                 ajaxCall({bookId:bookId, success:function(data) {
                         let bookInfo = new SingleBookInfo({newData:data});
                         contentRow.children(".book-info").html(bookInfo.info);
@@ -161,27 +160,27 @@ class SingleBookInfo {
             };
             this.info = $(
                 "<table class='table mb-2 book-info-table'>" +
-                    "<tr class='bg-light book-author'>" +
+                    "<tr class='bg-light book-author' data-prop='author'>" +
                         "<td> author: </td>" +
                         "<td class='book-info-cell' >" + newData.author + "</td>" +
                         "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='author' placeholder='Author' type='text' value='" + newData.author + "'></td>" +
                     "</tr>" +
-                    "<tr class='bg-light book-title'>" +
+                    "<tr class='bg-light book-title' data-prop='title'>" +
                         "<td> title: </td>" +
                         "<td class='book-info-cell' >" + newData.title + "</td>" +
                         "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='title' placeholder='Title' type='text' value='" + newData.title + "'></td>" +
                     "</tr>" +
-                    "<tr class='bg-light book-publisher'>" +
+                    "<tr class='bg-light' data-prop='publisher'>" +
                         "<td> publisher: </td>" +
                         "<td class='book-info-cell' >" + newData.publisher + "</td>" +
                         "<td class='book-edit-cell p-1 align-middle d-none'><input class='form-control' maxlength='200' name='publisher' type='text' placeholder='Publisher' value='" + newData.publisher + "'></td>" +
                     "</tr>" +
-                    "<tr class='bg-light book-genre'>" +
+                    "<tr class='bg-light' data-prop='genre'>" +
                         "<td> genre: </td>" +
                         "<td class='book-info-cell' >" + GENRES.genreFromNumbers(newData.genre) + "</td>" +
                         "<td class='book-edit-cell p-1 align-middle d-none'><select class='form-control' name='genre'>" + GENRES.generateGenreOptions(newData.genre) + "</select></td>" +
                     "</tr>" +
-                    "<tr class='bg-light book-isbn'>" +
+                    "<tr class='bg-light' data-prop='isbn'>" +
                         "<td> isbn: </td>" +
                         "<td class='book-info-cell' >" + newData.isbn + "</td>" +
                         "<td class='book-edit-cell p-1 align-middle d-none'><input maxlength='17' class='form-control' name='isbn' placeholder='ISBN' type='text' value='" + newData.isbn + "'></td>" +
@@ -216,26 +215,16 @@ class SingleBookInfo {
             let id = contentRow.attr("data-bookid");
             let author = contentRow.find(".book-author > .book-info-cell").first().text();
             let title = contentRow.find(".book-title > .book-info-cell").first().text();
+            console.log(["DUPA" , body, id, author, title]);
             body.html("Do you want to delete book: " + author + " - " + title + " ?<br>");
             $("#deleteBookConfirmed").attr('data-bookid', id);
         });
 
-        this.editDeleteButtons.children(".edit-book-button").click(function() {
-            obj.editDeleteButtons.addClass("d-none");
-            obj.infoCells.addClass("d-none");
-            obj.saveCancelButtons.removeClass("d-none");
-            obj.editCells.removeClass("d-none");
-        });
+        this.editDeleteButtons.children(".edit-book-button").click(goEditMode);
 
-        this.saveCancelButtons.children(".cancel-edit-book-button").click(function() {
-           obj.editDeleteButtons.removeClass("d-none");
-           obj.infoCells.removeClass("d-none");
-           obj.saveCancelButtons.addClass("d-none");
-           obj.editCells.addClass("d-none");
-        });
+        this.saveCancelButtons.children(".cancel-edit-book-button").click(goInfoMode);
 
         this.saveCancelButtons.children(".save-book-button").click(function() {
-            console.log(obj.editInputsToJson());
             let contentRow = $(this).closest(".content-row");
             let id = contentRow.attr("data-bookid");
             let data = obj.editInputsToJson();
@@ -244,8 +233,9 @@ class SingleBookInfo {
                 type: "PUT",
                 data: data,
                 success: function(data) {
-                    console.log("edit successful");
-                    /* TODO update content-row title and author*/
+                    if (DEBUG) console.log("edit successful");
+                    obj.updateData(data);
+                    goInfoMode();
                 },
                 error: function(data) {
                     obj.showEditErrors(data);
@@ -253,8 +243,23 @@ class SingleBookInfo {
             })
         });
 
+        function goInfoMode() {
+            obj.editDeleteButtons.removeClass("d-none");
+            obj.infoCells.removeClass("d-none");
+            obj.saveCancelButtons.addClass("d-none");
+            obj.editCells.addClass("d-none");
+        }
+
+
+        function goEditMode() {
+            obj.editDeleteButtons.addClass("d-none");
+            obj.infoCells.addClass("d-none");
+            obj.saveCancelButtons.removeClass("d-none");
+            obj.editCells.removeClass("d-none");
+        }
 
     }
+
 
 
     editInputsToJson() {
@@ -266,7 +271,7 @@ class SingleBookInfo {
         });
         data['genre'] = $('select[name="genre"]').val();
         return data;
-    }
+    };
 
     showEditErrors(data) {
         $.each($(this).find('input, select'), function() {
@@ -280,6 +285,27 @@ class SingleBookInfo {
             failedElement.tooltip({title: values.join(". ")});
             failedElement.tooltip('show');
         });
-    }
-}
+    };
 
+    updateData(data) {
+        $.each($(this.info).find("tr"), function() {
+            let prop = $(this).attr("data-prop");
+            let propValue = data[prop];
+            let infoCell = $(this).find(".book-info-cell");
+            let editCell = $(this).find(".book-edit-cell");
+            if (prop === "genre") {
+                infoCell.text(GENRES.genreFromNumbers(propValue));
+                editCell.html("<select class='form-control' name='genre'>" + GENRES.generateGenreOptions(propValue) + "</select>");
+            } else {
+                infoCell.text(propValue);
+                editCell.attr("value", propValue);
+            }
+
+        });
+        // update cickable row title and author
+        let selector = ".clickable-row[data-bookid='" + data.id + "']";
+        let clickableRow = $(selector);
+        clickableRow.children().eq(0).text(data.author);
+        clickableRow.children().eq(1).text(data.title);
+    };
+}
